@@ -1,0 +1,21 @@
+fir_text,expected_ipc
+The accused assaulted the complainant using hands and caused simple injuries.,IPC_323
+The accused assaulted the complainant and threatened him with death.,IPC_323;IPC_506
+Unknown persons committed theft by breaking into the complainant's house and stealing gold ornaments.,IPC_379;IPC_454
+The accused cheated the complainant by taking money on false promises of business returns.,IPC_420
+The accused abused the complainant and issued criminal threats.,IPC_504;IPC_506
+The accused caused death of a person by driving the vehicle in a rash and negligent manner.,IPC_304A
+The accused wrongfully restrained the complainant and assaulted him.,IPC_341;IPC_323
+The accused threatened the complainant to give false evidence in court.,IPC_195A
+The accused outraged the modesty of a woman by using criminal force.,IPC_354
+The accused committed criminal breach of trust by misappropriating entrusted money.,IPC_406
+The accused entered the complainant's house unlawfully with intent to commit an offence.,IPC_441;IPC_448
+The accused extorted money from the complainant by threatening harm.,IPC_384;IPC_506
+The accused forged documents to cheat the complainant.,IPC_465;IPC_420
+The accused voluntarily caused grievous hurt using a dangerous weapon.,IPC_326
+The accused insulted and provoked the complainant causing breach of peace.,IPC_504
+The accused kidnapped the victim with intent to cause harm.,IPC_363
+The accused attempted to commit murder by attacking with a knife.,IPC_307
+The accused committed mischief causing damage to public property.,IPC_427
+The accused intimidated the complainant through repeated threats.,IPC_506
+The accused stole a motor vehicle parked outside the house.,IPC_379

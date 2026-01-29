@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>AI Legal Assistant</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body {
+    font-family: Arial;
+    background: #f3f4f6;
+    padding: 20px;
+}
+.container {
+    max-width: 1000px;
+    margin: auto;
+}
+.card {
+    background: white;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 6px;
+}
+textarea {
+    width: 100%;
+    height: 120px;
+}
+button {
+    padding: 8px 14px;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 4px;
+}
+.section {
+    border-left: 4px solid #2563eb;
+    padding-left: 10px;
+    margin-bottom: 10px;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h2>⚖️ AI Legal Assistant – FIR Analysis</h2>
+
+<div class="card">
+<h3>📝 Enter FIR Text</h3>
+<textarea id="fir">
+The accused assaulted the complainant and threatened to kill him.
+</textarea><br><br>
+<button onclick="analyze()">Analyze FIR</button>
+<span id="status"></span>
+</div>
+
+<div class="card">
+<h3>📄 Summary</h3>
+<p id="summary">—</p>
+</div>
+
+<div class="card">
+<h3>📊 Legal Sections Distribution</h3>
+<canvas id="chart" height="120"></canvas>
+</div>
+
+<div class="card">
+<h3>⚖️ Retrieved Legal Sections</h3>
+<div id="sections"></div>
+</div>
+
+<div class="card" style="font-size:12px;color:#555">
+⚠️ Disclaimer: This system is for academic and legal awareness purposes only.
+</div>
+
+</div>
+
+<script>
+let chart;
+
+async function analyze() {
+    const fir = document.getElementById("fir").value;
+    document.getElementById("status").innerText = "Analyzing...";
+
+    const res = await fetch("/analyze_fir", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({fir_text: fir})
+    });
+
+    const data = await res.json();
+    document.getElementById("status").innerText = "";
+
+    // SUMMARY
+    document.getElementById("summary").innerText = data.summary;
+
+    // SECTIONS
+    const div = document.getElementById("sections");
+    div.innerHTML = "";
+
+    data.sections.forEach(s => {
+        const d = document.createElement("div");
+        d.className = "section";
+        d.innerHTML = `
+            <b>${s.section_text.split("\n")[0]}</b><br>
+            <small>Confidence: ${(s.confidence * 100).toFixed(1)}%</small>
+            <pre style="white-space:pre-wrap">${s.section_text}</pre>
+        `;
+        div.appendChild(d);
+    });
+
+    // CHART
+    if (chart) chart.destroy();
+    chart = new Chart(document.getElementById("chart"), {
+        type: "bar",
+        data: {
+            labels: ["IPC Sections", "CrPC Sections"],
+            datasets: [{
+                data: [data.ipc_count, data.crpc_count]
+            }]
+        },
+        options: {
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+}
+</script>
+
+</body>
+</html>
