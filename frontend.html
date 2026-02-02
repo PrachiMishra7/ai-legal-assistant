@@ -1,129 +1,345 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>AI Legal Assistant</title>
+<title>AI Legal Assistant – FIR Analysis</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
+:root {
+  --primary: #4f46e5;
+  --secondary: #06b6d4;
+  --accent: #22c55e;
+  --bg: #f1f5f9;
+  --card: #ffffff;
+  --text: #1f2937;
+  --muted: #6b7280;
+}
+
+* { box-sizing: border-box; }
+
 body {
-    font-family: Arial;
-    background: #f3f4f6;
-    padding: 20px;
+  margin: 0;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: linear-gradient(135deg, #eef2ff, #f8fafc);
+  color: var(--text);
 }
+
+/* ---------- HEADER ---------- */
+header {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  padding: 28px 20px;
+  text-align: center;
+}
+
+header h1 { margin: 0; font-size: 28px; }
+header p { margin-top: 6px; opacity: 0.9; }
+
+/* ---------- LAYOUT ---------- */
 .container {
-    max-width: 1000px;
-    margin: auto;
+  max-width: 1100px;
+  margin: 30px auto;
+  padding: 0 20px;
+  display: grid;
+  gap: 20px;
 }
+
+/* ---------- CARD ---------- */
 .card {
-    background: white;
-    padding: 15px;
-    margin-bottom: 15px;
-    border-radius: 6px;
+  background: var(--card);
+  padding: 20px;
+  border-radius: 14px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
 }
+
+/* ---------- TITLES ---------- */
+.card h2 {
+  margin-top: 0;
+  font-size: 20px;
+  border-left: 5px solid var(--primary);
+  padding-left: 10px;
+}
+
+/* ---------- INPUT ---------- */
 textarea {
-    width: 100%;
-    height: 120px;
+  width: 100%;
+  height: 150px;
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
 }
+
+textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* ---------- BUTTON ---------- */
 button {
-    padding: 8px 14px;
-    background: #2563eb;
-    color: white;
-    border: none;
-    border-radius: 4px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 20px;
+  cursor: pointer;
 }
+
+button:hover { transform: translateY(-2px); }
+button:disabled { opacity: 0.6; }
+
+#status {
+  margin-left: 10px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ---------- SUMMARY ---------- */
+.summary-box {
+  background: linear-gradient(135deg, #ecfeff, #eef2ff);
+  border-left: 5px solid var(--secondary);
+  padding: 16px;
+  border-radius: 10px;
+}
+
+/* ---------- METRICS ---------- */
+.metrics {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.metric {
+  flex: 1;
+  min-width: 200px;
+  background: #f8fafc;
+  padding: 16px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.metric h1 {
+  margin: 10px 0 0;
+  font-size: 34px;
+}
+
+/* ---------- SECTIONS ---------- */
 .section {
-    border-left: 4px solid #2563eb;
-    padding-left: 10px;
-    margin-bottom: 10px;
+  background: #f8fafc;
+  border-left: 6px solid var(--primary);
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 14px;
+}
+
+.section-title { font-weight: 600; }
+.confidence { font-size: 13px; color: var(--muted); }
+
+.progress {
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 6px 0 10px;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--secondary));
+}
+
+/* ---------- DROPDOWN ---------- */
+.details {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+.details.open { max-height: 1200px; }
+
+.toggle {
+  color: var(--primary);
+  cursor: pointer;
+  font-size: 13px;
+}
+
+/* ---------- FOOTER ---------- */
+footer {
+  text-align: center;
+  font-size: 12px;
+  color: var(--muted);
+  margin: 30px 0;
 }
 </style>
 </head>
 
 <body>
+
+<header>
+  <h1>⚖️ AI Legal Assistant</h1>
+  <p>AI-powered FIR Analysis using IPC & CrPC</p>
+</header>
+
 <div class="container">
 
-<h2>⚖️ AI Legal Assistant – FIR Analysis</h2>
-
+<!-- INPUT -->
 <div class="card">
-<h3>📝 Enter FIR Text</h3>
-<textarea id="fir">
+  <h2>📝 Enter FIR Text</h2>
+  <textarea id="fir">
 The accused assaulted the complainant and threatened to kill him.
-</textarea><br><br>
-<button onclick="analyze()">Analyze FIR</button>
-<span id="status"></span>
+  </textarea><br><br>
+  <button id="btn" onclick="analyze()">Analyze FIR</button>
+  <span id="status"></span>
 </div>
 
+<!-- SUMMARY -->
 <div class="card">
-<h3>📄 Summary</h3>
-<p id="summary">—</p>
+  <h2>🧠 Legal Summary</h2>
+  <div id="summary" class="summary-box">—</div>
 </div>
 
+<!-- METRICS -->
 <div class="card">
-<h3>📊 Legal Sections Distribution</h3>
-<canvas id="chart" height="120"></canvas>
+  <h2>📈 Model Performance</h2>
+  <div class="metrics">
+    <div class="metric">
+      <strong>Precision@5</strong>
+      <h1 id="precision">—</h1>
+    </div>
+    <div class="metric">
+      <strong>Recall@5</strong>
+      <h1 id="recall">—</h1>
+    </div>
+    <div class="metric">
+      <strong>Accuracy</strong>
+      <h1 id="accuracy">—</h1>
+    </div>
+  </div>
+  <canvas id="metricChart" height="120" style="margin-top:20px"></canvas>
 </div>
 
+<!-- IPC / CRPC DISTRIBUTION -->
 <div class="card">
-<h3>⚖️ Retrieved Legal Sections</h3>
-<div id="sections"></div>
+  <h2>📊 Legal Sections Distribution</h2>
+  <canvas id="chart" height="120"></canvas>
 </div>
 
-<div class="card" style="font-size:12px;color:#555">
-⚠️ Disclaimer: This system is for academic and legal awareness purposes only.
+<!-- SECTIONS -->
+<div class="card">
+  <h2>⚖️ Retrieved IPC & CrPC Sections</h2>
+  <div id="sections"></div>
 </div>
 
 </div>
+
+<footer>
+⚠️ Academic & legal awareness tool only — not legal advice.
+</footer>
 
 <script>
-let chart;
+let chart, metricChart;
 
 async function analyze() {
-    const fir = document.getElementById("fir").value;
-    document.getElementById("status").innerText = "Analyzing...";
+  const fir = document.getElementById("fir").value;
+  const btn = document.getElementById("btn");
+  const status = document.getElementById("status");
 
-    const res = await fetch("/analyze_fir", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({fir_text: fir})
-    });
+  btn.disabled = true;
+  status.innerText = "Analyzing FIR...";
 
-    const data = await res.json();
-    document.getElementById("status").innerText = "";
+  const res = await fetch("/analyze_fir", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ fir_text: fir })
+  });
 
-    // SUMMARY
-    document.getElementById("summary").innerText = data.summary;
+  const data = await res.json();
+  btn.disabled = false;
+  status.innerText = "";
 
-    // SECTIONS
-    const div = document.getElementById("sections");
-    div.innerHTML = "";
+  // SUMMARY
+  document.getElementById("summary").innerText = data.summary;
 
-    data.sections.forEach(s => {
-        const d = document.createElement("div");
-        d.className = "section";
-        d.innerHTML = `
-            <b>${s.section_text.split("\n")[0]}</b><br>
-            <small>Confidence: ${(s.confidence * 100).toFixed(1)}%</small>
-            <pre style="white-space:pre-wrap">${s.section_text}</pre>
-        `;
-        div.appendChild(d);
-    });
+  // METRICS
+  document.getElementById("precision").innerText = Math.round(data.precision * 100) + "%";
+  document.getElementById("recall").innerText = Math.round(data.recall * 100) + "%";
+  document.getElementById("accuracy").innerText = Math.round(data.accuracy * 100) + "%";
 
-    // CHART
-    if (chart) chart.destroy();
-    chart = new Chart(document.getElementById("chart"), {
-        type: "bar",
-        data: {
-            labels: ["IPC Sections", "CrPC Sections"],
-            datasets: [{
-                data: [data.ipc_count, data.crpc_count]
-            }]
-        },
-        options: {
-            scales: { y: { beginAtZero: true } }
-        }
-    });
+  // METRIC CHART
+  if (metricChart) metricChart.destroy();
+  metricChart = new Chart(document.getElementById("metricChart"), {
+    type: "bar",
+    data: {
+      labels: ["Precision", "Recall", "Accuracy"],
+      datasets: [{
+        data: [
+          data.precision * 100,
+          data.recall * 100,
+          data.accuracy * 100
+        ],
+        backgroundColor: ["#4f46e5", "#22c55e", "#06b6d4"]
+      }]
+    },
+    options: {
+      scales: { y: { beginAtZero: true, max: 100 } },
+      plugins: { legend: { display: false } }
+    }
+  });
+
+  // SECTIONS
+  const container = document.getElementById("sections");
+  container.innerHTML = "";
+
+  data.sections.forEach((s, i) => {
+    const percent = Math.round(s.confidence * 100);
+    const lines = s.section_text.split("\n");
+    const preview = lines.slice(0, 3).join("\n");
+
+    const div = document.createElement("div");
+    div.className = "section";
+    div.innerHTML = `
+      <div class="section-title">${lines[0]}</div>
+      <div class="confidence">Confidence: ${percent}%</div>
+      <div class="progress">
+        <div class="progress-bar" style="width:${percent}%"></div>
+      </div>
+
+      <pre style="white-space:pre-wrap;font-size:13px">${preview}</pre>
+      <span class="toggle" onclick="toggleDetails(${i})">Read more ▾</span>
+
+      <div class="details" id="details-${i}">
+        <pre style="white-space:pre-wrap;font-size:13px">${lines.join("\n")}</pre>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+
+  // IPC / CRPC DISTRIBUTION
+  if (chart) chart.destroy();
+  chart = new Chart(document.getElementById("chart"), {
+    type: "bar",
+    data: {
+      labels: ["IPC Sections", "CrPC Sections"],
+      datasets: [{
+        data: [data.ipc_count, data.crpc_count],
+        backgroundColor: ["#4f46e5", "#22c55e"]
+      }]
+    },
+    options: {
+      scales: { y: { beginAtZero: true } },
+      plugins: { legend: { display: false } }
+    }
+  });
+}
+
+function toggleDetails(i) {
+  const el = document.getElementById(`details-${i}`);
+  const toggle = el.previousElementSibling;
+  el.classList.toggle("open");
+  toggle.innerText = el.classList.contains("open")
+    ? "Show less ▴"
+    : "Read more ▾";
 }
 </script>
 
