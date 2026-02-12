@@ -2,344 +2,1047 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Legal Assistant – FIR Analysis</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
 :root {
-  --primary: #4f46e5;
-  --secondary: #06b6d4;
-  --accent: #22c55e;
-  --bg: #f1f5f9;
-  --card: #ffffff;
-  --text: #1f2937;
-  --muted: #6b7280;
+  --primary: #8b5cf6;
+  --primary-dark: #7c3aed;
+  --primary-light: #a78bfa;
+  --secondary: #ec4899;
+  --accent: #14b8a6;
+  --accent-light: #2dd4bf;
+  --warning: #f59e0b;
+  --success: #10b981;
+  --danger: #ef4444;
+  --dark: #1e1b4b;
+  --dark-secondary: #312e81;
+  --bg-main: #0f0b1f;
+  --bg-card: #1a1534;
+  --bg-card-hover: #221b3d;
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --border: #2d2449;
+  --glow: rgba(139, 92, 246, 0.4);
 }
 
-* { box-sizing: border-box; }
+* { 
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 body {
-  margin: 0;
-  font-family: "Segoe UI", Arial, sans-serif;
-  background: linear-gradient(135deg, #eef2ff, #f8fafc);
-  color: var(--text);
+  font-family: 'Poppins', sans-serif;
+  background: var(--bg-main);
+  color: var(--text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
 }
 
-/* ---------- HEADER ---------- */
+/* Animated background */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 40% 20%, rgba(20, 184, 166, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+  animation: backgroundPulse 15s ease-in-out infinite;
+}
+
+@keyframes backgroundPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Floating legal icons */
+.floating-icon {
+  position: fixed;
+  font-size: 3rem;
+  opacity: 0.05;
+  pointer-events: none;
+  z-index: 0;
+  animation: float 20s ease-in-out infinite;
+}
+
+.floating-icon:nth-child(1) { top: 10%; left: 10%; animation-delay: 0s; }
+.floating-icon:nth-child(2) { top: 60%; right: 15%; animation-delay: 5s; }
+.floating-icon:nth-child(3) { bottom: 20%; left: 20%; animation-delay: 10s; }
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-20px) rotate(5deg); }
+  50% { transform: translateY(0) rotate(0deg); }
+  75% { transform: translateY(20px) rotate(-5deg); }
+}
+
 header {
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%);
   color: white;
-  padding: 28px 20px;
+  padding: 3.5rem 2rem 4rem;
   text-align: center;
+  box-shadow: 0 10px 40px rgba(139, 92, 246, 0.3);
+  position: relative;
+  overflow: hidden;
+  z-index: 10;
 }
 
-header h1 { margin: 0; font-size: 28px; }
-header p { margin-top: 6px; opacity: 0.9; }
+header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent 30%, rgba(139, 92, 246, 0.1) 50%, transparent 70%);
+  animation: headerShine 8s linear infinite;
+}
 
-/* ---------- LAYOUT ---------- */
+@keyframes headerShine {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.header-content {
+  position: relative;
+  z-index: 2;
+}
+
+header h1 {
+  font-size: 3rem;
+  font-weight: 800;
+  margin-bottom: 0.75rem;
+  letter-spacing: -1px;
+  text-shadow: 0 0 30px rgba(139, 92, 246, 0.5);
+  animation: titleGlow 3s ease-in-out infinite;
+}
+
+@keyframes titleGlow {
+  0%, 100% { text-shadow: 0 0 30px rgba(139, 92, 246, 0.5); }
+  50% { text-shadow: 0 0 50px rgba(139, 92, 246, 0.8), 0 0 70px rgba(236, 72, 153, 0.4); }
+}
+
+header p {
+  font-size: 1.25rem;
+  opacity: 0.95;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+}
+
+.badge {
+  display: inline-block;
+  background: rgba(139, 92, 246, 0.2);
+  border: 1px solid var(--primary-light);
+  padding: 0.5rem 1.25rem;
+  border-radius: 50px;
+  font-size: 0.875rem;
+  margin-top: 1rem;
+  font-weight: 500;
+  backdrop-filter: blur(10px);
+}
+
 .container {
-  max-width: 1100px;
-  margin: 30px auto;
-  padding: 0 20px;
+  max-width: 1400px;
+  margin: 3rem auto;
+  padding: 0 2rem;
+  position: relative;
+  z-index: 10;
+}
+
+/* Hero Input Section */
+.hero-section {
+  background: linear-gradient(135deg, var(--bg-card) 0%, var(--dark-secondary) 100%);
+  padding: 3rem;
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 0 0 0 1px var(--border);
+  border: 1px solid var(--border);
+  margin-bottom: 3rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-section::before {
+  content: '⚖️';
+  position: absolute;
+  right: -50px;
+  top: -50px;
+  font-size: 15rem;
+  opacity: 0.03;
+  transform: rotate(15deg);
+}
+
+.input-grid {
   display: grid;
-  gap: 20px;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+  align-items: start;
 }
 
-/* ---------- CARD ---------- */
-.card {
-  background: var(--card);
-  padding: 20px;
-  border-radius: 14px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+.input-section h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
-/* ---------- TITLES ---------- */
-.card h2 {
-  margin-top: 0;
-  font-size: 20px;
-  border-left: 5px solid var(--primary);
-  padding-left: 10px;
-}
-
-/* ---------- INPUT ---------- */
 textarea {
   width: 100%;
-  height: 150px;
-  padding: 14px;
-  border-radius: 10px;
-  border: 1px solid #d1d5db;
-  font-size: 14px;
+  height: 200px;
+  padding: 1.25rem;
+  border-radius: 16px;
+  border: 2px solid var(--border);
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
+  resize: vertical;
+  transition: all 0.3s ease;
+  background: rgba(15, 11, 31, 0.6);
+  color: var(--text-primary);
+  line-height: 1.7;
+  backdrop-filter: blur(10px);
 }
 
 textarea:focus {
   outline: none;
   border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2), 0 0 30px rgba(139, 92, 246, 0.3);
 }
 
-/* ---------- BUTTON ---------- */
+textarea::placeholder {
+  color: var(--text-muted);
+}
+
 button {
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
   color: white;
   border: none;
-  border-radius: 10px;
-  padding: 12px 20px;
+  border-radius: 14px;
+  padding: 1rem 2.5rem;
+  font-size: 1.125rem;
+  font-weight: 700;
   cursor: pointer;
+  transition: all 0.4s ease;
+  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
+  font-family: 'Poppins', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  position: relative;
+  overflow: hidden;
 }
 
-button:hover { transform: translateY(-2px); }
-button:disabled { opacity: 0.6; }
-
-#status {
-  margin-left: 10px;
-  font-size: 13px;
-  color: var(--muted);
+button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  transition: left 0.5s;
 }
 
-/* ---------- SUMMARY ---------- */
-.summary-box {
-  background: linear-gradient(135deg, #ecfeff, #eef2ff);
-  border-left: 5px solid var(--secondary);
-  padding: 16px;
-  border-radius: 10px;
+button:hover::before {
+  left: 100%;
 }
 
-/* ---------- METRICS ---------- */
-.metrics {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
+button:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 32px rgba(139, 92, 246, 0.6);
 }
 
-.metric {
-  flex: 1;
-  min-width: 200px;
-  background: #f8fafc;
-  padding: 16px;
-  border-radius: 12px;
+button:active {
+  transform: translateY(-1px) scale(1);
+}
+
+.upload-zone {
+  background: rgba(139, 92, 246, 0.05);
+  border: 2px dashed var(--primary-light);
+  border-radius: 16px;
+  padding: 2rem;
   text-align: center;
+  transition: all 0.3s ease;
+}
+
+.upload-zone:hover {
+  background: rgba(139, 92, 246, 0.1);
+  border-color: var(--primary);
+}
+
+input[type="file"] {
+  display: none;
+}
+
+.file-upload-btn {
+  background: rgba(139, 92, 246, 0.2);
+  border: 2px solid var(--primary);
+  color: var(--text-primary);
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  cursor: pointer;
+  display: inline-block;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.file-upload-btn:hover {
+  background: rgba(139, 92, 246, 0.3);
+  transform: scale(1.05);
+}
+
+/* Results Grid */
+.results-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.card {
+  background: var(--bg-card);
+  padding: 2.5rem;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3), 0 0 0 1px var(--border);
+  border: 1px solid var(--border);
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+  transform: scaleX(0);
+  transition: transform 0.6s ease;
+}
+
+.card:hover::before {
+  transform: scaleX(1);
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 60px rgba(139, 92, 246, 0.3), 0 0 0 1px var(--primary);
+  background: var(--bg-card-hover);
+}
+
+.card h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1.75rem;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.summary-box {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%);
+  border-left: 5px solid var(--primary);
+  padding: 2rem;
+  border-radius: 16px;
+  font-size: 1.125rem;
+  line-height: 1.9;
+  color: var(--text-secondary);
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.summary-box::before {
+  content: '💼';
+  position: absolute;
+  right: -20px;
+  top: -20px;
+  font-size: 8rem;
+  opacity: 0.05;
+}
+
+/* Metrics with animation */
+.metrics { 
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.metric { 
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(236, 72, 153, 0.1));
+  padding: 2rem 1.5rem;
+  border-radius: 18px;
+  text-align: center;
+  border: 1px solid var(--border);
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.metric::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(139, 92, 246, 0.1), transparent);
+  animation: metricShine 4s linear infinite;
+}
+
+@keyframes metricShine {
+  0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+  100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+}
+
+.metric:hover {
+  transform: translateY(-8px) scale(1.05);
+  box-shadow: 0 15px 40px rgba(139, 92, 246, 0.4);
+  border-color: var(--primary);
+}
+
+.metric strong {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 1rem;
+  position: relative;
+  z-index: 2;
 }
 
 .metric h1 {
-  margin: 10px 0 0;
-  font-size: 34px;
+  font-size: 3rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--primary-light), var(--secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+  position: relative;
+  z-index: 2;
+  animation: numberPulse 2s ease-in-out infinite;
 }
 
-/* ---------- SECTIONS ---------- */
-.section {
-  background: #f8fafc;
-  border-left: 6px solid var(--primary);
-  padding: 16px;
-  border-radius: 12px;
-  margin-bottom: 14px;
+@keyframes numberPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
 }
 
-.section-title { font-weight: 600; }
-.confidence { font-size: 13px; color: var(--muted); }
-
-.progress {
-  height: 6px;
-  background: #e5e7eb;
-  border-radius: 4px;
+/* Section cards with enhanced styling */
+.section { 
+  background: linear-gradient(135deg, var(--bg-card), var(--dark-secondary));
+  border: 1px solid var(--border);
+  border-left: 5px solid var(--primary);
+  padding: 2rem;
+  border-radius: 16px;
+  margin-bottom: 1.5rem;
+  transition: all 0.4s ease;
+  position: relative;
   overflow: hidden;
-  margin: 6px 0 10px;
 }
 
-.progress-bar {
+.section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 5px;
   height: 100%;
-  background: linear-gradient(90deg, var(--accent), var(--secondary));
+  background: linear-gradient(180deg, var(--primary), var(--secondary), var(--accent));
+  animation: borderFlow 3s linear infinite;
 }
 
-/* ---------- DROPDOWN ---------- */
-.details {
+@keyframes borderFlow {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 0% 100%; }
+}
+
+.section:hover {
+  transform: translateX(8px);
+  box-shadow: -5px 10px 40px rgba(139, 92, 246, 0.3);
+  border-color: var(--primary);
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.confidence {
+  display: inline-block;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: rgba(20, 184, 166, 0.15);
+  padding: 0.5rem 1.25rem;
+  border-radius: 50px;
+  margin-bottom: 1rem;
+  border: 1px solid var(--accent);
+  box-shadow: 0 0 20px rgba(20, 184, 166, 0.3);
+  animation: confidencePulse 2s ease-in-out infinite;
+}
+
+@keyframes confidencePulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(20, 184, 166, 0.3); }
+  50% { box-shadow: 0 0 30px rgba(20, 184, 166, 0.5); }
+}
+
+.progress { 
+  height: 12px;
+  background: rgba(139, 92, 246, 0.1);
+  border-radius: 50px;
+  overflow: hidden;
+  margin: 1.25rem 0;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+  border: 1px solid var(--border);
+}
+
+.progress-bar { 
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--primary), var(--secondary));
+  background-size: 200% 100%;
+  border-radius: 50px;
+  transition: width 0.8s ease;
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.6);
+  animation: progressShine 2s linear infinite;
+}
+
+@keyframes progressShine {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+.details { 
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.4s ease;
+  transition: max-height 0.5s ease, opacity 0.5s ease, margin-top 0.5s ease;
+  opacity: 0;
 }
-.details.open { max-height: 1200px; }
 
-.toggle {
-  color: var(--primary);
+.details.open { 
+  max-height: 2000px;
+  opacity: 1;
+  margin-top: 1.5rem;
+}
+
+.toggle { 
+  color: var(--primary-light);
   cursor: pointer;
-  font-size: 13px;
+  font-size: 1rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+  padding: 0.75rem 1.5rem;
+  background: rgba(139, 92, 246, 0.1);
+  border-radius: 50px;
+  border: 1px solid var(--primary);
 }
 
-/* ---------- FOOTER ---------- */
-footer {
-  text-align: center;
-  font-size: 12px;
-  color: var(--muted);
-  margin: 30px 0;
+.toggle:hover {
+  background: rgba(139, 92, 246, 0.2);
+  gap: 0.75rem;
+  transform: translateX(5px);
 }
+
+pre {
+  white-space: pre-wrap;
+  font-size: 0.938rem;
+  line-height: 1.8;
+  color: var(--text-secondary);
+  background: rgba(15, 11, 31, 0.6);
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  margin: 0.75rem 0;
+  font-family: 'Courier New', monospace;
+  backdrop-filter: blur(10px);
+}
+
+#uploadStatus {
+  margin-top: 1.25rem;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 600;
+  text-align: center;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+#uploadStatus:not(:empty) {
+  background: rgba(20, 184, 166, 0.1);
+  border: 1px solid var(--accent);
+  color: var(--text-primary);
+  animation: statusFadeIn 0.5s ease;
+}
+
+@keyframes statusFadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+canvas {
+  margin-top: 1.5rem;
+  max-height: 350px;
+  filter: drop-shadow(0 4px 20px rgba(139, 92, 246, 0.2));
+}
+
+/* Loading animation */
+.loading {
+  position: relative;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 40px;
+  height: 40px;
+  margin: -20px 0 0 -20px;
+  border: 4px solid transparent;
+  border-top-color: var(--primary);
+  border-right-color: var(--secondary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-main);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--primary), var(--secondary));
+  border-radius: 10px;
+  border: 2px solid var(--bg-main);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--primary-light), var(--secondary));
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .input-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .results-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .metrics {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 767px) {
+  header h1 {
+    font-size: 2rem;
+  }
+  
+  .hero-section {
+    padding: 2rem;
+  }
+  
+  .card {
+    padding: 1.5rem;
+  }
+  
+  .metric h1 {
+    font-size: 2.25rem;
+  }
+}
+
+/* Entrance animations */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-section {
+  animation: slideUp 0.8s ease forwards;
+}
+
+.card {
+  animation: slideUp 0.8s ease forwards;
+  opacity: 0;
+}
+
+.card:nth-child(1) { animation-delay: 0.1s; }
+.card:nth-child(2) { animation-delay: 0.2s; }
+.card:nth-child(3) { animation-delay: 0.3s; }
+.card:nth-child(4) { animation-delay: 0.4s; }
 </style>
 </head>
 
 <body>
 
+<!-- Floating legal icons -->
+<div class="floating-icon">⚖️</div>
+<div class="floating-icon">📜</div>
+<div class="floating-icon">🔨</div>
+
 <header>
+<div class="header-content">
   <h1>⚖️ AI Legal Assistant</h1>
-  <p>AI-powered FIR Analysis using IPC & CrPC</p>
+  <p>Advanced FIR Analysis powered by IPC & CrPC Intelligence</p>
+  <div class="badge">🤖 Powered by AI | 🔒 Secure & Confidential</div>
+</div>
 </header>
 
 <div class="container">
 
-<!-- INPUT -->
-<div class="card">
-  <h2>📝 Enter FIR Text</h2>
-  <textarea id="fir">
-The accused assaulted the complainant and threatened to kill him.
-  </textarea><br><br>
-  <button id="btn" onclick="analyze()">Analyze FIR</button>
-  <span id="status"></span>
-</div>
-
-<!-- SUMMARY -->
-<div class="card">
-  <h2>🧠 Legal Summary</h2>
-  <div id="summary" class="summary-box">—</div>
-</div>
-
-<!-- METRICS -->
-<div class="card">
-  <h2>📈 Model Performance</h2>
-  <div class="metrics">
-    <div class="metric">
-      <strong>Precision@5</strong>
-      <h1 id="precision">—</h1>
+<!-- Hero Input Section -->
+<div class="hero-section">
+  <div class="input-grid">
+    <div class="input-section">
+      <h2>📝 Enter FIR Details</h2>
+      <textarea id="fir" placeholder="Describe the incident in detail... (e.g., The accused assaulted the complainant and threatened to kill him.)">The accused assaulted the complainant and threatened to kill him.</textarea>
+      <br><br>
+      <button id="btn" onclick="analyze()">🔍 Analyze FIR</button>
     </div>
-    <div class="metric">
-      <strong>Recall@5</strong>
-      <h1 id="recall">—</h1>
-    </div>
-    <div class="metric">
-      <strong>Accuracy</strong>
-      <h1 id="accuracy">—</h1>
+    
+    <div class="input-section">
+      <h2>📂 Upload FIR PDF</h2>
+      <div class="upload-zone">
+        <label for="pdfFile" class="file-upload-btn">
+          📄 Choose PDF File
+        </label>
+        <input type="file" id="pdfFile" accept=".pdf" />
+        <p style="color: var(--text-muted); font-size: 0.875rem; margin-top: 1rem;">Drag & drop or click to upload</p>
+      </div>
+      <button onclick="uploadPDF()" style="width: 100%; margin-top: 1rem;">⬆️ Upload & Analyze</button>
+      <div id="uploadStatus"></div>
     </div>
   </div>
-  <canvas id="metricChart" height="120" style="margin-top:20px"></canvas>
 </div>
 
-<!-- IPC / CRPC DISTRIBUTION -->
-<div class="card">
-  <h2>📊 Legal Sections Distribution</h2>
-  <canvas id="chart" height="120"></canvas>
+<!-- Results Grid -->
+<div class="results-grid">
+  
+  <div class="card full-width">
+    <h2>🧠 AI-Generated Legal Summary</h2>
+    <div id="summary" class="summary-box">No analysis performed yet. Enter FIR text or upload a PDF to begin your legal analysis.</div>
+  </div>
+
+  <div class="card">
+    <h2>📈 Model Performance Metrics</h2>
+    <div class="metrics">
+      <div class="metric">
+        <strong>Precision@5</strong>
+        <h1 id="precision">—</h1>
+      </div>
+      <div class="metric">
+        <strong>Recall@5</strong>
+        <h1 id="recall">—</h1>
+      </div>
+      <div class="metric">
+        <strong>Accuracy</strong>
+        <h1 id="accuracy">—</h1>
+      </div>
+    </div>
+    <canvas id="metricChart" height="100"></canvas>
+  </div>
+
+  <div class="card">
+    <h2>📊 Legal Sections Distribution</h2>
+    <canvas id="chart" height="100"></canvas>
+  </div>
+
+  <div class="card full-width">
+    <h2>⚖️ Retrieved IPC & CrPC Sections</h2>
+    <div id="sections"></div>
+  </div>
+
 </div>
 
-<!-- SECTIONS -->
-<div class="card">
-  <h2>⚖️ Retrieved IPC & CrPC Sections</h2>
-  <div id="sections"></div>
 </div>
-
-</div>
-
-<footer>
-⚠️ Academic & legal awareness tool only — not legal advice.
-</footer>
 
 <script>
 let chart, metricChart;
 
-async function analyze() {
-  const fir = document.getElementById("fir").value;
-  const btn = document.getElementById("btn");
-  const status = document.getElementById("status");
-
+async function analyze(){
+  const fir=document.getElementById("fir").value;
+  const btn=document.getElementById("btn");
+  
   btn.disabled = true;
-  status.innerText = "Analyzing FIR...";
+  btn.innerHTML = "⏳ Analyzing...";
+  
+  try{
+    const res=await fetch("/analyze_fir",{method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({fir_text:fir})});
+    if(!res.ok){
+      const err=await res.json().catch(()=>({detail:"Request failed"}));
+      throw new Error(err.detail||"Request failed");
+    }
+    const data=await res.json();
+    renderResults(data);
+  }catch(err){
+    document.getElementById("summary").innerText="❌ " + err.message;
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = "🔍 Analyze FIR";
+  }
+}
 
-  const res = await fetch("/analyze_fir", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({ fir_text: fir })
-  });
+// Handle file input change
+document.getElementById("pdfFile").addEventListener("change", function(e) {
+  const fileName = e.target.files[0]?.name || "";
+  if(fileName) {
+    document.getElementById("uploadStatus").innerText = "📄 Selected: " + fileName;
+  }
+});
 
-  const data = await res.json();
-  btn.disabled = false;
-  status.innerText = "";
+async function uploadPDF(){
+  const fileInput=document.getElementById("pdfFile");
 
-  // SUMMARY
-  document.getElementById("summary").innerText = data.summary;
+  if(!fileInput.files.length){
+    alert("⚠️ Please select a PDF file first");
+    return;
+  }
 
-  // METRICS
-  document.getElementById("precision").innerText = Math.round(data.precision * 100) + "%";
-  document.getElementById("recall").innerText = Math.round(data.recall * 100) + "%";
-  document.getElementById("accuracy").innerText = Math.round(data.accuracy * 100) + "%";
+  const uploadBtn = event.target;
+  uploadBtn.disabled = true;
+  uploadBtn.innerHTML = "⏳ Processing...";
+  
+  document.getElementById("uploadStatus").innerText="⏳ Uploading & analyzing PDF...";
 
-  // METRIC CHART
-  if (metricChart) metricChart.destroy();
+  const formData=new FormData();
+  formData.append("file",fileInput.files[0]);
+  try{
+    const res=await fetch("/upload_pdf",{method:"POST",body:formData});
+    if(!res.ok){
+      const err=await res.json().catch(()=>({detail:"Upload failed"}));
+      throw new Error(err.detail||"Upload failed");
+    }
+    const data=await res.json();
+    console.log("PDF upload response:", data); // Debug log
+    document.getElementById("uploadStatus").innerText="✅ PDF processed successfully!";
+    renderResults(data);
+  }catch(err){
+    console.error("PDF upload error:", err); // Debug log
+    document.getElementById("uploadStatus").innerText="❌ " + err.message;
+  } finally {
+    uploadBtn.disabled = false;
+    uploadBtn.innerHTML = "⬆️ Upload & Analyze";
+  }
+}
+
+function renderResults(data){
+  console.log("Received data:", data); // Debug log to see what's coming from backend
+
+  // Update summary
+  document.getElementById("summary").innerText = data.summary || "No summary available";
+  
+  // Update metrics - handle both decimal (0.85) and percentage (85) formats
+  const precision = data.precision !== undefined ? (data.precision > 1 ? data.precision : data.precision * 100) : 0;
+  const recall = data.recall !== undefined ? (data.recall > 1 ? data.recall : data.recall * 100) : 0;
+  const accuracy = data.accuracy !== undefined ? (data.accuracy > 1 ? data.accuracy : data.accuracy * 100) : 0;
+  
+  document.getElementById("precision").innerText = Math.round(precision) + "%";
+  document.getElementById("recall").innerText = Math.round(recall) + "%";
+  document.getElementById("accuracy").innerText = Math.round(accuracy) + "%";
+
+  // Update metrics chart
+  if(metricChart) metricChart.destroy();
   metricChart = new Chart(document.getElementById("metricChart"), {
     type: "bar",
     data: {
       labels: ["Precision", "Recall", "Accuracy"],
       datasets: [{
-        data: [
-          data.precision * 100,
-          data.recall * 100,
-          data.accuracy * 100
+        data: [precision, recall, accuracy],
+        backgroundColor: [
+          'rgba(139, 92, 246, 0.8)',
+          'rgba(20, 184, 166, 0.8)',
+          'rgba(236, 72, 153, 0.8)'
         ],
-        backgroundColor: ["#4f46e5", "#22c55e", "#06b6d4"]
+        borderColor: [
+          'rgba(139, 92, 246, 1)',
+          'rgba(20, 184, 166, 1)',
+          'rgba(236, 72, 153, 1)'
+        ],
+        borderWidth: 2,
+        borderRadius: 10,
+        borderSkipped: false
       }]
     },
     options: {
-      scales: { y: { beginAtZero: true, max: 100 } },
-      plugins: { legend: { display: false } }
+      responsive: true,
+      maintainAspectRatio: true,
+      scales: {
+        y: {
+          beginAtZero: true,
+          max: 100,
+          grid: { 
+            color: 'rgba(139, 92, 246, 0.1)',
+            drawBorder: false
+          },
+          ticks: { color: '#cbd5e1', font: { size: 12, weight: '600' }}
+        },
+        x: {
+          grid: { display: false },
+          ticks: { color: '#cbd5e1', font: { size: 12, weight: '600' }}
+        }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: { 
+          backgroundColor: '#1a1534',
+          padding: 14,
+          cornerRadius: 10,
+          titleColor: '#f1f5f9',
+          bodyColor: '#cbd5e1',
+          borderColor: '#8b5cf6',
+          borderWidth: 1
+        }
+      }
     }
   });
 
-  // SECTIONS
+  // Update sections
   const container = document.getElementById("sections");
   container.innerHTML = "";
+  
+  if(data.sections && data.sections.length > 0) {
+    data.sections.forEach((s, i) => {
+      const percent = Math.round(s.confidence * 100);
+      const lines = s.section_text.split("\n");
+      const preview = lines.slice(0, 3).join("\n");
 
-  data.sections.forEach((s, i) => {
-    const percent = Math.round(s.confidence * 100);
-    const lines = s.section_text.split("\n");
-    const preview = lines.slice(0, 3).join("\n");
+      const div = document.createElement("div");
+      div.className = "section";
+      div.innerHTML = `
+        <div class="section-title">${lines[0]}</div>
+        <div class="confidence">⭐ Confidence: ${percent}%</div>
+        <div class="progress"><div class="progress-bar" style="width:${percent}%"></div></div>
+        <pre>${preview}</pre>
+        <span class="toggle" onclick="toggleDetails(${i})">📖 Read more ▾</span>
+        <div class="details" id="details-${i}">
+          <pre>${lines.join("\n")}</pre>
+        </div>`;
+      container.appendChild(div);
+    });
+  } else {
+    container.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 2rem;">No sections retrieved yet. Perform an analysis to see results.</p>';
+  }
 
-    const div = document.createElement("div");
-    div.className = "section";
-    div.innerHTML = `
-      <div class="section-title">${lines[0]}</div>
-      <div class="confidence">Confidence: ${percent}%</div>
-      <div class="progress">
-        <div class="progress-bar" style="width:${percent}%"></div>
-      </div>
-
-      <pre style="white-space:pre-wrap;font-size:13px">${preview}</pre>
-      <span class="toggle" onclick="toggleDetails(${i})">Read more ▾</span>
-
-      <div class="details" id="details-${i}">
-        <pre style="white-space:pre-wrap;font-size:13px">${lines.join("\n")}</pre>
-      </div>
-    `;
-    container.appendChild(div);
-  });
-
-  // IPC / CRPC DISTRIBUTION
-  if (chart) chart.destroy();
+  // Update distribution chart
+  const ipcCount = data.ipc_count || 0;
+  const crpcCount = data.crpc_count || 0;
+  
+  if(chart) chart.destroy();
   chart = new Chart(document.getElementById("chart"), {
-    type: "bar",
+    type: "doughnut",
     data: {
       labels: ["IPC Sections", "CrPC Sections"],
       datasets: [{
-        data: [data.ipc_count, data.crpc_count],
-        backgroundColor: ["#4f46e5", "#22c55e"]
+        data: [ipcCount, crpcCount],
+        backgroundColor: [
+          'rgba(139, 92, 246, 0.8)',
+          'rgba(20, 184, 166, 0.8)'
+        ],
+        borderColor: [
+          'rgba(139, 92, 246, 1)',
+          'rgba(20, 184, 166, 1)'
+        ],
+        borderWidth: 3,
+        hoverOffset: 15
       }]
     },
     options: {
-      scales: { y: { beginAtZero: true } },
-      plugins: { legend: { display: false } }
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'bottom',
+          labels: {
+            color: '#cbd5e1',
+            font: { size: 14, weight: '600' },
+            padding: 20,
+            usePointStyle: true
+          }
+        },
+        tooltip: { 
+          backgroundColor: '#1a1534',
+          padding: 14,
+          cornerRadius: 10,
+          titleColor: '#f1f5f9',
+          bodyColor: '#cbd5e1',
+          borderColor: '#8b5cf6',
+          borderWidth: 1
+        }
+      }
     }
   });
 }
 
-function toggleDetails(i) {
-  const el = document.getElementById(`details-${i}`);
-  const toggle = el.previousElementSibling;
+function toggleDetails(i){
+  const el=document.getElementById(`details-${i}`);
   el.classList.toggle("open");
-  toggle.innerText = el.classList.contains("open")
-    ? "Show less ▴"
-    : "Read more ▾";
+  
+  const toggle = el.previousElementSibling;
+  if(el.classList.contains("open")) {
+    toggle.innerHTML = "📖 Read less ▴";
+  } else {
+    toggle.innerHTML = "📖 Read more ▾";
+  }
 }
 </script>
 
